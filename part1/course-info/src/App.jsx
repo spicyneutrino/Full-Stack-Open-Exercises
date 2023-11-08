@@ -1,67 +1,76 @@
-const Header = ({ course }) => {
+import { useState } from 'react';
 
+const Heading = ({ title }) => {
+  return <h1>{title}</h1>;
+};
+
+const Button = ({ name, onClick }) => {
+  return <button onClick={onClick}>{name}</button>;
+};
+
+const StatisticLine = ({ text, value }) => {
   return (
-    <h1>{course}</h1>
-  )
-}
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
+  );
+};
 
-const Part = ({ part }) => {
+const Statistics = ({ score }) => {
+  if (!score.good && !score.neutral && !score.bad) {
+    return <div>No feedback given</div>;
+  }
+  let all = score.good + score.neutral + score.bad;
+  let average = all === 0 ? 0 : (score.good - score.bad) / all;
+  let positive = all === 0 ? 0 : (score.good / all) * 100;
   return (
     <>
-      <div>{part.name} {part.exercises}</div>
+      <table>
+        <tbody>
+          <StatisticLine text="good" value={score.good} />
+          <StatisticLine text="neutral" value={score.neutral} />
+          <StatisticLine text="bad" value={score.bad} />
+          <StatisticLine text="average" value={average} />
+          <StatisticLine text="positive" value={positive} />
+        </tbody>
+      </table>
     </>
-  )
-}
-const Content = ({ parts }) => {
-  return (
-    <div>
-      <Part part={parts[0]} />
-      <Part part={parts[1]} />
-      <Part part={parts[2]} />
-    </div>
-  )
-}
-
-const Total = ({ parts }) => {
-  return(
-    <div>
-      {parts[0].exercises + parts[1].exercises + parts[2].exercises}
-    </div>
-  )
-}
-
-
-
-
+  );
+};
 
 const App = () => {
-  {console.clear()}
+  const [score, setScore] = useState({
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  });
 
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
-  }
+  const handleGood = () => {
+    setScore((prevScore) => ({ ...prevScore, good: prevScore.good + 1 }));
+  };
+  const handleNeutral = () => {
+    setScore((prevScore) => ({ ...prevScore, neutral: prevScore.neutral + 1 }));
+  };
 
-return (
-  <div>
-    <Header course={course.name} />
-    <Content parts={course.parts} />
-    <Total parts={course.parts} />
-  </div>
-)
-}
+  const handleBad = () => {
+    setScore((prevScore) => ({ ...prevScore, bad: prevScore.bad + 1 }));
+  };
 
-export default App
+  return (
+    <>
+      <Heading title="give feedback" />
+      <Button name="good" onClick={handleGood} />
+      <Button name="neutral" onClick={handleNeutral} />
+      <Button name="bad" onClick={handleBad} />
+
+      {/* <button onClick={handleGood}>good</button>
+      <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
+      <button onClick={() => setBad(bad + 1)}>bad</button> */}
+      <Heading title="statistics" />
+      <Statistics score={score} />
+    </>
+  );
+};
+
+export default App;
